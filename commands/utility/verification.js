@@ -15,6 +15,7 @@ module.exports = {
       .setTitle("Верификация")
       .setColor("Grey")
       .setFooter({ text: "Верификация" })
+      .setAuthor({ name: interaction.user.username })
       .setTimestamp();
 
     const r03 = new ButtonBuilder()
@@ -35,7 +36,7 @@ module.exports = {
     const ranksRow = new ActionRowBuilder().addComponents(r03, r4, ally);
 
     const response = await interaction.reply({
-      content: `Выберите свой ранг в альнсе`,
+      content: `Убедитесь, что ваш никнэйм совпадает с никнэймом в игре. \n Выберите свой ранг в альнсе`,
       components: [ranksRow],
     });
 
@@ -47,6 +48,7 @@ module.exports = {
         time: 60_000,
       });
       NewUserInfo.setColor("Yellow");
+      NewUserInfo.addFields({ name: 'Состояние', value: "Ждет проверки ника и должности от R4-5" });
       const accept = new ButtonBuilder()
         .setCustomId("accept")
         .setLabel("Принять")
@@ -82,5 +84,26 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
+    //const R45collectorFilter = (i) => i.user.id === interaction.user.id; #TODO ADD R4-5 filter by role
+    try {
+        const verificationAproved = await response.awaitMessageComponent({
+        time: 600_000,
+      });
+
+      if (verificationAproved.customId === "accept") {
+        NewUserInfo.setColor("Green");
+        NewUserInfo.setFields({ name: "Состояние", value: "Верификация пройдена" ,  inline: true });
+        await verificationAproved.update({ content: "", embeds: [NewUserInfo], components: [] });
+      } else if (verificationAproved.customId === "decline") {
+        NewUserInfo.setColor("Red");
+        NewUserInfo.setFields({ name: "Состояние", value: "Верификация отклонена", inline: true });
+
+        await verificationAproved.update({ content: "", embeds: [NewUserInfo], components: [] });
+        }
+    } catch (error) {
+      console.log(error);
+    }
+
+    
   },
 };

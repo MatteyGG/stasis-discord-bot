@@ -19,7 +19,8 @@ module.exports = {
     async execute(interaction) {
         const user = interaction.options.getUser('user');
         const nickname = interaction.options.getString('nickname');
-        await user.setNickname(nickname);
+        await interaction.client.user.setUsername(nickname);
         await interaction.reply(`Changed nickname of ${user.username} to ${nickname}`);
     }
+    
 }

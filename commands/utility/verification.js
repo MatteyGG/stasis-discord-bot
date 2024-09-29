@@ -20,7 +20,6 @@ module.exports = {
     const NewUserInfo = new EmbedBuilder()
       .setTitle("Верификация")
       .setColor("Grey")
-      .setDescription("Начата верификация")
       .setFooter({ text: "Верификация" })
       .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
 

@@ -6,7 +6,7 @@ const {
   EmbedBuilder,
   PermissionsBitField 
 } = require("discord.js");
-const {r03, r4, ally} = require('../../config.json');
+const {r0, r1, r2, r3, r4, ally, verificationRole, non_verificationRole} = require('../../config.json');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("verification")
@@ -20,14 +20,30 @@ module.exports = {
     const NewUserInfo = new EmbedBuilder()
       .setTitle("Верификация")
       .setColor("Grey")
+      .setDescription("Начата верификация")
       .setFooter({ text: "Верификация" })
-      .setAuthor({ name: interaction.user.username })
-      .setTimestamp();
+      .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
 
-    const r03Button = new ButtonBuilder()
-      .setCustomId("r03")
-      .setLabel("R0-3")
-      .setStyle(ButtonStyle.Secondary);
+      .setTimestamp();
+    const r0Button = new ButtonBuilder()
+      .setCustomId("r0")
+      .setLabel("R0")
+      .setStyle(ButtonStyle.Primary);
+    
+    const r1Button = new ButtonBuilder()
+      .setCustomId("r1")
+      .setLabel("R1")
+      .setStyle(ButtonStyle.Primary);
+    
+    const r2Button = new ButtonBuilder()
+      .setCustomId("r2")
+      .setLabel("R2")
+      .setStyle(ButtonStyle.Primary);
+    
+    const r3Button = new ButtonBuilder()
+      .setCustomId("r3")
+      .setLabel("R3")
+      .setStyle(ButtonStyle.Primary);
 
     const r4Button = new ButtonBuilder()
       .setCustomId("r4")
@@ -39,7 +55,7 @@ module.exports = {
       .setLabel("Союзник")
       .setStyle(ButtonStyle.Success);
 
-    const ranksRow = new ActionRowBuilder().addComponents(r03Button, r4Button, allyButton);
+    const ranksRow = new ActionRowBuilder().addComponents(r0Button, r1Button, r2Button, r3Button, allyButton);
 
     const response = await interaction.reply({
       content: `Убедитесь, что ваш никнэйм совпадает с никнэймом в игре. \nПосле, Выберите свой ранг в альнсе`,
@@ -69,12 +85,35 @@ module.exports = {
         .setLabel("Отклонить")
         .setStyle(ButtonStyle.Danger);
       const acceptRow = new ActionRowBuilder().addComponents(accept, decline);
-
-      if (rank.customId === "r03") {
-        NewUserInfo.addFields({ name: "Ранг", value: "R0-3", inline: true });
-        ChoosenRank = r03;
+      if (rank.customId === "r0") {
+        NewUserInfo.addFields({ name: "Ранг", value: "R0", inline: true });
+        ChoosenRank = r0;
         await rank.update({
-          content: `Ожидает подтверждения`,
+          content: `Ожидает подтверждения от R4-5`,
+          embeds: [NewUserInfo],
+          components: [acceptRow],
+        });
+      } else if (rank.customId === "r1") {
+        NewUserInfo.addFields({ name: "Ранг", value: "R1", inline: true });
+        ChoosenRank = r1;
+        await rank.update({
+          content: `Ожидает подтверждения от R4-5`,
+          embeds: [NewUserInfo],
+          components: [acceptRow],
+        });
+      } else if (rank.customId === "r2") {
+        NewUserInfo.addFields({ name: "Ранг", value: "R2", inline: true });
+        ChoosenRank = r2;
+        await rank.update({
+          content: `Ожидает подтверждения от R4-5`,
+          embeds: [NewUserInfo],
+          components: [acceptRow],
+          })}
+      if (rank.customId === "r3") {
+        NewUserInfo.addFields({ name: "Ранг", value: "R3", inline: true });
+        ChoosenRank = r3;
+        await rank.update({
+          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
@@ -82,7 +121,7 @@ module.exports = {
         NewUserInfo.addFields({ name: "Ранг", value: "R4", inline: true });
         ChoosenRank = r4;
         await rank.update({
-          content: `Ожидает подтверждения`,
+          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
@@ -90,6 +129,7 @@ module.exports = {
         NewUserInfo.addFields({ name: "Ранг", value: "Союзник", inline: true });
         ChoosenRank = ally;
         await rank.update({
+          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
@@ -113,6 +153,8 @@ module.exports = {
           inline: true,
         });
         await interaction.member.roles.add(ChoosenRank);
+        await interaction.member.roles.remove(non_verificationRole);
+        await interaction.member.roles.add(verificationRole);
         await verificationAproved.update({
           content: "",
           embeds: [NewUserInfo],

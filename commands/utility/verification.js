@@ -10,15 +10,21 @@ const {r0, r1, r2, r3, r4, ally, verificationRole, non_verificationRole} = requi
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("verification")
-    .setDescription("Начать верификацию"),
+    .setDescription("Начать верификацию")
+    .setDescriptionLocalizations({
+      "ru": "Начать верификацию",
+      "en-US": "Start verification"
+    }),
 
   async execute(interaction) {
     global.ChoosenRank = null;
+    global.ChoosenRankText = null;
     console.log(`${interaction.user.username} started verification`);
     console.log(interaction.member.guild.name);
     
     const NewUserInfo = new EmbedBuilder()
       .setTitle("Верификация")
+      .setDescription("Убедитесь, что никнэйм на сервере совпадает с никнэймом в игре.\n Выберите ранг. \n Be sure that your nickname matches the nickname in the game. Select a rank.")
       .setColor("Grey")
       .setFooter({ text: "Верификация" })
       .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
@@ -55,9 +61,8 @@ module.exports = {
       .setStyle(ButtonStyle.Success);
 
     const ranksRow = new ActionRowBuilder().addComponents(r0Button, r1Button, r2Button, r3Button, allyButton);
-
     const response = await interaction.reply({
-      content: `Убедитесь, что ваш никнэйм совпадает с никнэймом в игре. \nПосле, Выберите свой ранг в альнсе`,
+      embeds: [NewUserInfo],
       components: [ranksRow],
     });
 
@@ -70,10 +75,7 @@ module.exports = {
         time: 600_000,
       });
       NewUserInfo.setColor("Yellow");
-      NewUserInfo.addFields({
-        name: "Состояние",
-        value: "Ждет проверки ника и должности от R4-5",
-      });
+      NewUserInfo.setDescription("Ожидает подтверждения от R4-5. Прикрепите скриншот своего профиля в игре, чтоб ускорить процесс. \n Waiting for approval from R4-5. Attach your profile screenshot from game, so it takes less time. ");
       const accept = new ButtonBuilder()
         .setCustomId("accept")
         .setLabel("Принять")
@@ -87,48 +89,48 @@ module.exports = {
       if (rank.customId === "r0") {
         NewUserInfo.addFields({ name: "Ранг", value: "R0", inline: true });
         ChoosenRank = r0;
+        ChoosenRankText = "R0";
         await rank.update({
-          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
       } else if (rank.customId === "r1") {
         NewUserInfo.addFields({ name: "Ранг", value: "R1", inline: true });
         ChoosenRank = r1;
+        ChoosenRankText = "R1";
         await rank.update({
-          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
       } else if (rank.customId === "r2") {
         NewUserInfo.addFields({ name: "Ранг", value: "R2", inline: true });
         ChoosenRank = r2;
+        ChoosenRankText = "R2";
         await rank.update({
-          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
           })}
       if (rank.customId === "r3") {
         NewUserInfo.addFields({ name: "Ранг", value: "R3", inline: true });
         ChoosenRank = r3;
+        ChoosenRankText = "R3";
         await rank.update({
-          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
       } else if (rank.customId === "r4") {
         NewUserInfo.addFields({ name: "Ранг", value: "R4", inline: true });
         ChoosenRank = r4;
+        ChoosenRankText = "R4";
         await rank.update({
-          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
       } else if (rank.customId === "ally") {
         NewUserInfo.addFields({ name: "Ранг", value: "Союзник", inline: true });
         ChoosenRank = ally;
+        ChoosenRankText = "Союзник";
         await rank.update({
-          content: `Ожидает подтверждения от R4-5`,
           embeds: [NewUserInfo],
           components: [acceptRow],
         });
@@ -146,11 +148,12 @@ module.exports = {
       });
       if (verificationAproved.customId === "accept") {
         NewUserInfo.setColor("Green");
+        NewUserInfo.setDescription("\u200B")
         NewUserInfo.setFields({
           name: "Состояние",
           value: "Верификация пройдена",
           inline: true,
-        });
+        }, { name: "Ранг", value: ChoosenRankText, inline: true });
         await interaction.member.roles.add(ChoosenRank);
         await interaction.member.roles.remove(non_verificationRole);
         await interaction.member.roles.add(verificationRole);
@@ -161,6 +164,7 @@ module.exports = {
         });
       } else if (verificationAproved.customId === "decline") {
         NewUserInfo.setColor("Red");
+        NewUserInfo.setDescription("\u200B")
         NewUserInfo.setFields({
           name: "Состояние",
           value: "Верификация отклонена",

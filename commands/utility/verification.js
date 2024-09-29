@@ -6,7 +6,7 @@ const {
   EmbedBuilder,
   PermissionsBitField 
 } = require("discord.js");
-
+const {r03, r4, ally} = require('../../config.json');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("verification")
@@ -24,25 +24,25 @@ module.exports = {
       .setAuthor({ name: interaction.user.username })
       .setTimestamp();
 
-    const r03 = new ButtonBuilder()
+    const r03Button = new ButtonBuilder()
       .setCustomId("r03")
       .setLabel("R0-3")
       .setStyle(ButtonStyle.Secondary);
 
-    const r4 = new ButtonBuilder()
+    const r4Button = new ButtonBuilder()
       .setCustomId("r4")
       .setLabel("R4")
       .setStyle(ButtonStyle.Primary);
 
-    const ally = new ButtonBuilder()
+    const allyButton = new ButtonBuilder()
       .setCustomId("ally")
       .setLabel("Союзник")
       .setStyle(ButtonStyle.Success);
 
-    const ranksRow = new ActionRowBuilder().addComponents(r03, r4, ally);
+    const ranksRow = new ActionRowBuilder().addComponents(r03Button, r4Button, allyButton);
 
     const response = await interaction.reply({
-      content: `Убедитесь, что ваш никнэйм совпадает с никнэймом в игре. \n Выберите свой ранг в альнсе`,
+      content: `Убедитесь, что ваш никнэйм совпадает с никнэймом в игре. \nПосле, Выберите свой ранг в альнсе`,
       components: [ranksRow],
     });
 
@@ -72,7 +72,7 @@ module.exports = {
 
       if (rank.customId === "r03") {
         NewUserInfo.addFields({ name: "Ранг", value: "R0-3", inline: true });
-        ChoosenRank = "1289964024754077707";
+        ChoosenRank = r03;
         await rank.update({
           content: `Ожидает подтверждения`,
           embeds: [NewUserInfo],
@@ -80,7 +80,7 @@ module.exports = {
         });
       } else if (rank.customId === "r4") {
         NewUserInfo.addFields({ name: "Ранг", value: "R4", inline: true });
-        ChoosenRank = "1289962490901561478";
+        ChoosenRank = r4;
         await rank.update({
           content: `Ожидает подтверждения`,
           embeds: [NewUserInfo],
@@ -88,7 +88,7 @@ module.exports = {
         });
       } else if (rank.customId === "ally") {
         NewUserInfo.addFields({ name: "Ранг", value: "Союзник", inline: true });
-        ChoosenRank = "1289964152038752257";
+        ChoosenRank = ally;
         await rank.update({
           embeds: [NewUserInfo],
           components: [acceptRow],

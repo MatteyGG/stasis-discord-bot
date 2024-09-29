@@ -4,13 +4,19 @@ const {
   ButtonStyle,
   SlashCommandBuilder,
   EmbedBuilder,
+  PermissionsBitField 
 } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("verification")
     .setDescription("Начать верификацию"),
+
   async execute(interaction) {
+    global.ChoosenRank = null;
+    console.log(`${interaction.user.username} started verification`);
+    console.log(interaction.member.guild.name);
+    
     const NewUserInfo = new EmbedBuilder()
       .setTitle("Верификация")
       .setColor("Grey")
@@ -42,13 +48,17 @@ module.exports = {
 
     const collectorFilter = (i) => i.user.id === interaction.user.id;
 
+
     try {
       const rank = await response.awaitMessageComponent({
         filter: collectorFilter,
-        time: 60_000,
+        time: 600_000,
       });
       NewUserInfo.setColor("Yellow");
-      NewUserInfo.addFields({ name: 'Состояние', value: "Ждет проверки ника и должности от R4-5" });
+      NewUserInfo.addFields({
+        name: "Состояние",
+        value: "Ждет проверки ника и должности от R4-5",
+      });
       const accept = new ButtonBuilder()
         .setCustomId("accept")
         .setLabel("Принять")
@@ -62,6 +72,7 @@ module.exports = {
 
       if (rank.customId === "r03") {
         NewUserInfo.addFields({ name: "Ранг", value: "R0-3", inline: true });
+        ChoosenRank = "1289964024754077707";
         await rank.update({
           content: `Ожидает подтверждения`,
           embeds: [NewUserInfo],
@@ -69,6 +80,7 @@ module.exports = {
         });
       } else if (rank.customId === "r4") {
         NewUserInfo.addFields({ name: "Ранг", value: "R4", inline: true });
+        ChoosenRank = "1289962490901561478";
         await rank.update({
           content: `Ожидает подтверждения`,
           embeds: [NewUserInfo],
@@ -76,6 +88,7 @@ module.exports = {
         });
       } else if (rank.customId === "ally") {
         NewUserInfo.addFields({ name: "Ранг", value: "Союзник", inline: true });
+        ChoosenRank = "1289964152038752257";
         await rank.update({
           embeds: [NewUserInfo],
           components: [acceptRow],
@@ -84,26 +97,43 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-    //const R45collectorFilter = (i) => i.user.id === interaction.user.id; #TODO ADD R4-5 filter by role
-    try {
-        const verificationAproved = await response.awaitMessageComponent({
-        time: 600_000,
-      });
+    
+    const R45collectorFilter = (i) => i.member.permissions.has(PermissionsBitField.Flags.ManageRoles)
 
+    try {
+      const verificationAproved = await response.awaitMessageComponent({
+        filter: R45collectorFilter,
+        time: 6000_000,
+      });
       if (verificationAproved.customId === "accept") {
         NewUserInfo.setColor("Green");
-        NewUserInfo.setFields({ name: "Состояние", value: "Верификация пройдена" ,  inline: true });
-        await verificationAproved.update({ content: "", embeds: [NewUserInfo], components: [] });
+        NewUserInfo.setFields({
+          name: "Состояние",
+          value: "Верификация пройдена",
+          inline: true,
+        });
+        await interaction.member.roles.add(ChoosenRank);
+        await verificationAproved.update({
+          content: "",
+          embeds: [NewUserInfo],
+          components: [],
+        });
       } else if (verificationAproved.customId === "decline") {
         NewUserInfo.setColor("Red");
-        NewUserInfo.setFields({ name: "Состояние", value: "Верификация отклонена", inline: true });
+        NewUserInfo.setFields({
+          name: "Состояние",
+          value: "Верификация отклонена",
+          inline: true,
+        });
 
-        await verificationAproved.update({ content: "", embeds: [NewUserInfo], components: [] });
-        }
+        await verificationAproved.update({
+          content: "",
+          embeds: [NewUserInfo],
+          components: [],
+        });
+      }
     } catch (error) {
       console.log(error);
     }
-
-    
   },
 };

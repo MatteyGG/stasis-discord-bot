@@ -180,8 +180,12 @@ module.exports = {
           inline: true,
         }, { name: "Ранг", value: global.ChoosenRankText, inline: true });
         await interaction.member.roles.add(global.ChoosenRank);
-        await interaction.member.roles.remove(non_verificationRole);
-        await interaction.member.roles.add(verificationRole);
+        try {
+          await interaction.member.roles.remove(non_verificationRole);
+          await interaction.member.roles.add(verificationRole);
+        } catch (error) {
+          console.log(error);
+        }
         await verificationAproved.update({
           content: "",
           embeds: [NewUserInfo],

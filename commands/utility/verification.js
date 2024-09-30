@@ -66,24 +66,24 @@ module.exports = {
     const ranksRow = new ActionRowBuilder().addComponents( r1Button, r2Button, r3Button, r4Button, allyButton);
 
     // Send the embed and the row with buttons to the user
-    const response = await interaction.reply({
+    await interaction.deferReply();
+    const response = await interaction.editReply({
       embeds: [NewUserInfo],
       components: [ranksRow],
     });
 
     // Create a filter for the collector
-    const collectorFilter = (i) => i.user.id === interaction.user.id;
-
+    const collectorFilter = i => i.user.id === interaction.user.id;
     try {
       // Wait for the user to select a rank
       const rank = await response.awaitMessageComponent({
         filter: collectorFilter,
-        time: 600_000,
+        time: 60_000,
       });
 
       // Create a new embed with information about the selected rank
       NewUserInfo.setColor("Yellow");
-      NewUserInfo.setDescription("Ожидает подтверждения от R4-5. Прикрепите скриншот своего профиля в игре, чтоб ускорить процесс. \n Waiting for approval from R4-5. Attach your profile screenshot from game, so it takes less time. ");
+      NewUserInfo.setDescription("Ожидает подтверждения от R4-5 в течении 15 минут. Прикрепите скриншот своего профиля в игре, чтоб ускорить процесс. \n Waiting for approval from R4-5. Attach your profile screenshot from game, so it takes less time. ");
       const accept = new ButtonBuilder()
         .setCustomId("accept")
         .setLabel("Принять")
@@ -93,6 +93,7 @@ module.exports = {
         .setCustomId("decline")
         .setLabel("Отклонить")
         .setStyle(ButtonStyle.Danger);
+
       const acceptRow = new ActionRowBuilder().addComponents(accept, decline);
 
       // Update the embed with the selected rank and the buttons
@@ -169,9 +170,10 @@ module.exports = {
       // Wait for the user to accept or decline the verification
       const verificationAproved = await response.awaitMessageComponent({
         filter: R45collectorFilter,
-        time: 6000_000,
+        time: 600_000,
       });
       if (verificationAproved.customId === "accept") {
+        console.log("verification accepted");
         NewUserInfo.setColor("Green");
         NewUserInfo.setDescription("\u200B")
         NewUserInfo.setFields({

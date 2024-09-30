@@ -1,5 +1,5 @@
 #Stasis discord bot
-FROM node:alpine
+FROM node:22-slim
 WORKDIR /stasis-discord-bot
 COPY package.json package-lock.json ./
 RUN npm install
